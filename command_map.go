@@ -29,8 +29,12 @@ type LocationResponse struct {
 // the next (or previous) will require using an offset and a limit. Look at the
 // API documentation for more information.
 
-func commandMap() error {
-	res, err := http.Get("https://pokeapi.co/api/v2/location-area/")
+func commandMap(cfg *config) error {
+	address := "https://pokeapi.co/api/v2/location-area/"
+	if cfg.next != nil {
+		address = *cfg.next
+	}
+	res, err := http.Get(address)
 	if err != nil {
 		return err
 	}
@@ -42,12 +46,13 @@ func commandMap() error {
 	if err != nil {
 		return err
 	}
-	// fmt.Printf("%s/n", body)
 
 	var locations LocationResponse
 	if err := json.Unmarshal(body, &locations); err != nil {
 		return err
 	}
+	cfg.next = locations.Next
+	cfg.previous = locations.Previous
 
 	for _, location := range locations.Results {
 		fmt.Printf("%s\n", location.Name)

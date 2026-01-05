@@ -11,6 +11,11 @@ func runRepl() {
 	prompt := "Pokedex > "
 	scanner := bufio.NewScanner(os.Stdin)
 
+	mapConfig := config {
+		next:		nil,
+		previous:	nil,
+	}
+
 	for {
 		// display the program prompt
 		fmt.Print(prompt)
@@ -22,7 +27,7 @@ func runRepl() {
 	    cleanedInput := cleanInput(scanner.Text())
 
         if command, exists := getCommands()[cleanedInput[0]]; exists {
-			err := command.callback()
+			err := command.callback(&mapConfig)
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -42,10 +47,15 @@ func cleanInput(text string) []string {
     return retString
 }
 
+type config struct {
+	next		*string
+	previous	*string
+}
+
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -59,6 +69,11 @@ func getCommands() map[string]cliCommand {
 			name:        "exit",
 			description: "Exit the Pokedex",
 			callback:    commandExit,
+		},
+		"map": {
+			name:		 "map",
+			description: "Displays the names of 20 location areas in the Pokemon world",
+			callback:	 commandMap,
 		},
 	}
 }
