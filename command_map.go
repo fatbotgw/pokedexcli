@@ -60,3 +60,37 @@ func commandMap(cfg *config) error {
 
 	return nil
 }
+
+func commandMapb(cfg *config) error {
+	if cfg.previous == nil {
+		fmt.Println("You're on the first page.")
+		return nil
+	}
+	address := *cfg.previous
+
+	res, err := http.Get(address)
+	if err != nil {
+		return err
+	}
+	body, err := io.ReadAll(res.Body)
+	res.Body.Close()
+	// if res.StatusCode > 299 {
+	// 	log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+	// }
+	if err != nil {
+		return err
+	}
+
+	var locations LocationResponse
+	if err := json.Unmarshal(body, &locations); err != nil {
+		return err
+	}
+	cfg.next = locations.Next
+	cfg.previous = locations.Previous
+
+	for _, location := range locations.Results {
+		fmt.Printf("%s\n", location.Name)
+	}
+
+	return nil
+}
