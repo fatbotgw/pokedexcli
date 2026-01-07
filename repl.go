@@ -5,13 +5,29 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/fatbotgw/pokedexcli/internal/pokecache"
 )
+
+type config struct {
+	pCache		*pokecache.Cache
+	next		*string
+	previous	*string
+}
+
+type cliCommand struct {
+	name        string
+	description string
+	callback    func(*config) error
+}
 
 func runRepl() {
 	prompt := "Pokedex > "
 	scanner := bufio.NewScanner(os.Stdin)
 
 	mapConfig := config {
+		pCache:		pokecache.NewCache(15 * time.Second),
 		next:		nil,
 		previous:	nil,
 	}
@@ -45,17 +61,6 @@ func runRepl() {
 func cleanInput(text string) []string {
 	retString := strings.Fields(strings.ToLower(text))
     return retString
-}
-
-type config struct {
-	next		*string
-	previous	*string
-}
-
-type cliCommand struct {
-	name        string
-	description string
-	callback    func(*config) error
 }
 
 func getCommands() map[string]cliCommand {

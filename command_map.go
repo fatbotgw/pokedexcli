@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// EXAMPLE:
 // {"name":"canalave-city-area","url":"https://pokeapi.co/api/v2/location-area/1/"}
 type Location struct {
     Name string `json:"name"`
@@ -30,21 +31,32 @@ type LocationResponse struct {
 // API documentation for more information.
 
 func commandMap(cfg *config) error {
-	address := "https://pokeapi.co/api/v2/location-area/"
+	// Changed initial address from:
+	// address := "https://pokeapi.co/api/v2/location-area/"
+	// to:
+	address := "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"
+	// in order for the caching of the first page to work correctly with
+	// the .previous that is used in commandMapb() below.
+
 	if cfg.next != nil {
 		address = *cfg.next
 	}
-	res, err := http.Get(address)
-	if err != nil {
-		return err
-	}
-	body, err := io.ReadAll(res.Body)
-	res.Body.Close()
-	// if res.StatusCode > 299 {
-	// 	log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
-	// }
-	if err != nil {
-		return err
+	body, exists := cfg.pCache.Get(address)
+
+	if !exists {
+		res, err := http.Get(address)
+		if err != nil {
+			return err
+		}
+		body, err = io.ReadAll(res.Body)
+		res.Body.Close()
+		// if res.StatusCode > 299 {
+		// 	log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+		// }
+		if err != nil {
+			return err
+		}
+		cfg.pCache.Add(address, body)
 	}
 
 	var locations LocationResponse
@@ -61,6 +73,7 @@ func commandMap(cfg *config) error {
 	return nil
 }
 
+
 func commandMapb(cfg *config) error {
 	if cfg.previous == nil {
 		fmt.Println("You're on the first page.")
@@ -68,17 +81,22 @@ func commandMapb(cfg *config) error {
 	}
 	address := *cfg.previous
 
-	res, err := http.Get(address)
-	if err != nil {
-		return err
-	}
-	body, err := io.ReadAll(res.Body)
-	res.Body.Close()
-	// if res.StatusCode > 299 {
-	// 	log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
-	// }
-	if err != nil {
-		return err
+	body, exists := cfg.pCache.Get(address)
+
+	if !exists {
+		res, err := http.Get(address)
+		if err != nil {
+			return err
+		}
+		body, err = io.ReadAll(res.Body)
+		res.Body.Close()
+		// if res.StatusCode > 299 {
+		// 	log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+		// }
+		if err != nil {
+			return err
+		}
+		cfg.pCache.Add(address, body)
 	}
 
 	var locations LocationResponse
