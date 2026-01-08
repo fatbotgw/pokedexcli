@@ -5,20 +5,18 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/fatbotgw/pokedexcli/internal/pokeapi"
 )
 
 // EXAMPLE:
 // {"name":"canalave-city-area","url":"https://pokeapi.co/api/v2/location-area/1/"}
-type Location struct {
-    Name string `json:"name"`
-    URL  string `json:"url"`
-}
 
 type LocationResponse struct {
 	Count 		int			`json:"count"`
 	Next		*string		`json:"next"`
 	Previous	*string		`json:"previous"`
-	Results		[]Location	`json:"results"`
+	Results		[]pokeapi.Location	`json:"results"`
 }
 
 // Displays the names of 20 location areas in the Pokemon world.
