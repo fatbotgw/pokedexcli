@@ -30,7 +30,7 @@ type LocationResponse struct {
 // the next (or previous) will require using an offset and a limit. Look at the
 // API documentation for more information.
 
-func commandMap(cfg *config) error {
+func commandMap(cfg *config, args []string) error {
 	// Changed initial address from:
 	// address := "https://pokeapi.co/api/v2/location-area/"
 	// to:
@@ -74,7 +74,7 @@ func commandMap(cfg *config) error {
 }
 
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, args []string) error {
 	if cfg.previous == nil {
 		fmt.Println("You're on the first page.")
 		return nil

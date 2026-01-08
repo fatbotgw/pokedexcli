@@ -19,7 +19,7 @@ type config struct {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, []string) error
 }
 
 func runRepl() {
@@ -43,7 +43,8 @@ func runRepl() {
 	    cleanedInput := cleanInput(scanner.Text())
 
         if command, exists := getCommands()[cleanedInput[0]]; exists {
-			err := command.callback(&mapConfig)
+        	arg := cleanedInput[1:]
+			err := command.callback(&mapConfig, arg)
 				if err != nil {
 					fmt.Println(err)
 				}
