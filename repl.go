@@ -3,17 +3,20 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/fatbotgw/pokedexcli/internal/pokecache"
+	"github.com/fatbotgw/pokedexcli/internal/pokeapi"
 )
 
 type config struct {
 	pCache		*pokecache.Cache
 	next		*string
 	previous	*string
+	pokedex 	map[string]pokeapi.Creature
 }
 
 type cliCommand struct {
@@ -23,6 +26,7 @@ type cliCommand struct {
 }
 
 func runRepl() {
+	rand.Seed(time.Now().UnixNano())
 	prompt := "Pokedex > "
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -30,6 +34,7 @@ func runRepl() {
 		pCache:		pokecache.NewCache(15 * time.Second),
 		next:		nil,
 		previous:	nil,
+		pokedex:	make(map[string]pokeapi.Creature),
 	}
 
 	for {
@@ -90,6 +95,11 @@ func getCommands() map[string]cliCommand {
 			name:		 "explore",
 			description: "List all Pokemon in an area",
 			callback:	 commandExplore,
+		},
+		"catch": {
+			name:		 "catch",
+			description: "Catch the Pokemon",
+			callback: 	 commandCatch,
 		},
 	}
 }
