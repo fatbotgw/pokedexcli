@@ -8,15 +8,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fatbotgw/pokedexcli/internal/pokecache"
 	"github.com/fatbotgw/pokedexcli/internal/pokeapi"
+	"github.com/fatbotgw/pokedexcli/internal/pokecache"
 )
 
 type config struct {
 	pCache		*pokecache.Cache
 	next		*string
 	previous	*string
-	pokedex 	map[string]pokeapi.Creature
+	pokedex 	map[string]pokeapi.Pokemon
 }
 
 type cliCommand struct {
@@ -34,7 +34,7 @@ func runRepl() {
 		pCache:		pokecache.NewCache(15 * time.Second),
 		next:		nil,
 		previous:	nil,
-		pokedex:	make(map[string]pokeapi.Creature),
+		pokedex:	make(map[string]pokeapi.Pokemon),
 	}
 
 	for {
@@ -100,6 +100,11 @@ func getCommands() map[string]cliCommand {
 			name:		 "catch",
 			description: "Catch the Pokemon",
 			callback: 	 commandCatch,
+		},
+		"inspect": {
+			name: 		 "inspect",
+			description: "Inpect the Pokemon",
+			callback: 	 commandInspect,
 		},
 	}
 }

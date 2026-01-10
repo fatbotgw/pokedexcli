@@ -31,13 +31,13 @@ func commandCatch(cfg *config, args []string) error {
 		return err
 	}
 
-	var pokemon pokeapi.Creature
+	var pokemon pokeapi.Pokemon
 	if err := json.Unmarshal(body, &pokemon); err != nil {
 		return err
 	}
 
 	maxXP := 500
-	pokeXP := pokemon.BaseXP
+	pokeXP := pokemon.BaseExperience
 	if pokeXP > maxXP {
 		maxXP = pokeXP
 	}
@@ -52,7 +52,7 @@ func commandCatch(cfg *config, args []string) error {
 		fmt.Println(pokeName + " was caught!")
 		// add to pokedex map
 		if cfg.pokedex == nil {
-			cfg.pokedex = make(map[string]pokeapi.Creature)
+			cfg.pokedex = make(map[string]pokeapi.Pokemon)
 		}
 		cfg.pokedex[pokemon.Name] = pokemon
 	} else {
